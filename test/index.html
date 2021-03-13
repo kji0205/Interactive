@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            background: cadetblue;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .me__status {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20vw;
+            height: 15vh;
+            background: aliceblue;
+            z-index: 10;
+            opacity: .3;
+        }
+
+        .health_bar {
+            position: relative;
+            width: 80%;
+            height: 20%;
+            background: white;
+            margin: 5% auto;
+            overflow: hidden;
+        }
+
+        .health {
+            position: relative;
+            width: 0%;
+            height: 100%;
+            background: red;
+            /*margin: 5% auto;*/
+            overflow: hidden;
+        }
+
+        .enemy {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            top: 50%;
+            right: 50%;
+            background: blue;
+            border-radius: 50%;
+            /*transition: all 1s ease;*/
+            /*transition: all 1s cubic-bezier(0.570, -0.140, 0.345, 1.225);*/
+        }
+
+        .me {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            top: 50%;
+            right: 50%;
+            background: darkred;
+            border-radius: 50%;
+            /*transition: all 1s ease;*/
+            /*transition: all 1s cubic-bezier(0.570, -0.140, 0.345, 1.225);*/
+        }
+
+        .finish {
+            position: absolute;
+            width: 200px;
+            height: 100px;
+            top: 200px;
+            left: 200px;
+            background: silver;
+            color: white;
+            font-size: 30px;
+            opacity: .5;
+            display: none;
+        }
+
+        .timer{
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 20vw;
+            height: 15vh;
+            background: aliceblue;
+            z-index: 10;
+            opacity: .3;
+            font-size: 20px;
+            margin: 15px;
+            text-align: center;
+        }
+        .count{
+            padding: 10px
+        }
+    </style>
+</head>
+<body>
+<div class="me__status">
+    <span>HEALTH</span>
+    <div class="health_bar">
+        <div class="health"></div>
+    </div>
+</div>
+
+<div class="timer">
+    <span class="count">60</span>
+</div>
+
+<!--enemy-->
+<div class="enemy">
+    <!--    <img src="devil.jpg" alt="">-->
+</div>
+
+<div class="me"></div>
+
+<div class="finish">
+    <span class="result">Success!</span>
+</div>
+
+<script>
+    let enemyX = 0;
+    let enemyY = 0;
+    let increaseSizeX = 15;
+    let increaseSizeY = 15;
+    const enemy = document.querySelector('.enemy')
+    const me = document.querySelector('.me')
+    let health = document.querySelector(".health")
+    const finishLayer = document.querySelector('.finish')
+    let hp = 0
+    let _enemyMove = null
+    let countdown = null
+    let isEnd = false
+
+    function enemyMove() {
+        if (isEnd) return
+        enemy.style.transform = "translate(" + enemyX + "px, " + enemyY + "px)"
+        _enemyMove = requestAnimationFrame(enemyMove)
+    }
+
+    function setEnemyPosition() {
+        // console.log(document.body.offsetWidth, document.body.offsetHeight)
+        const _enemy = enemy.getBoundingClientRect()
+        const _me = me.getBoundingClientRect()
+        // console.log(_enemy)
+        const _checkCrash = checkCrash(_enemy, _me)
+
+        if (_enemy.left < 0 || _enemy.left > document.body.offsetWidth - 30 || _checkCrash) {
+            increaseSizeX = -increaseSizeX
+        }
+        if (_enemy.top < 0 || _enemy.top > document.body.offsetHeight - 30 || _checkCrash) {
+            increaseSizeY = -increaseSizeY
+        }
+        enemyX += increaseSizeX
+        enemyY += increaseSizeY
+    }
+
+    // console.log('checkCrash')
+    const adjustRange = 15
+
+    function checkCrash(enemy, me) {
+        // console.log(enemy.top, enemy.bottom)
+        // console.log(enemy.left, enemy.right)
+        if (((me.left > enemy.left - adjustRange) && (me.left < enemy.left + adjustRange) ||
+            (me.right > enemy.right - adjustRange) && (me.right < enemy.right + adjustRange))
+            &&
+            (((me.top > enemy.top - adjustRange) && (me.top < enemy.top + adjustRange)) ||
+                ((me.bottom > enemy.bottom - adjustRange) && (me.bottom < enemy.bottom + adjustRange)))
+        ) {
+            console.log("Crashing")
+            hp += 10
+            health.style.width = hp + "%"
+            if (hp === 100) finish()
+            return true
+        }
+        return false
+    }
+
+    function finish() {
+        isEnd = true
+        finishLayer.style.display = 'block'
+        clearInterval(_setEnemyPosition)
+        clearInterval(countdown)
+        cancelAnimationFrame(_enemyMove)
+    }
+
+    enemyMove()
+    let _setEnemyPosition = setInterval(setEnemyPosition, 30)
+
+    window.onload = function () {
+        let positionX = 0
+        let positionY = 0
+        let increaseSize = 10
+        document.addEventListener('keydown', function (e) {
+            // console.log(me, enemy)
+
+            if (e.code === 'ArrowUp') {
+                positionY -= increaseSize
+                me.style.transform = "translate(" + positionX + "px, " + positionY + "px)"
+            } else if (e.code === 'ArrowDown') {
+                positionY += increaseSize
+                me.style.transform = "translate(" + positionX + "px, " + positionY + "px)"
+            } else if (e.code === 'ArrowLeft') {
+                positionX -= increaseSize
+                me.style.transform = "translate(" + positionX + "px, " + positionY + "px)"
+            } else if (e.code === 'ArrowRight') {
+                positionX += increaseSize
+                me.style.transform = "translate(" + positionX + "px, " + positionY + "px)"
+            }
+        }, false)
+
+        let count = 60
+        countdown = setInterval(_=>{
+            document.querySelector('.count').innerHTML = count--;
+        }, 1000)
+    }
+</script>
+</body>
+</html>

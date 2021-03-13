@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport">
+    <title>Title</title>
+    <style>
+        body {
+            position: relative;
+            background-color: black;
+            cursor: none;
+        }
+
+        h1 {
+            color: #fff;
+        }
+
+        .cursor_item {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: red;
+            top: 0;
+            left: 0;
+            margin: -50px 0 0 -50px;
+            /*transition: all 1s ease-in-out;*/
+            /*google search - css easing*/
+            transition: all 1s cubic-bezier(0.570, -0.140, 0.345, 1.225);
+        }
+        button{
+            font-size: 40px;
+            font-weight: bold;
+            background: #fff;
+            color: red;
+            padding: 30px 80px;
+            margin: 50px;
+            cursor: pointer;
+            transition: all .5s ease;
+        }
+        button:hover{
+            background: red;
+            color: white;
+            font-size: 80px;
+            padding: 100px 120px;
+        }
+    </style>
+    <script>
+        let cursor_item, h1
+        let x = 0
+        let y = 0;
+        let mx = 0
+        let my = 0
+        let speed = 0.5
+        window.onload = function () {
+            h1 = document.getElementsByTagName("h1")[0]
+            cursor_item = document.getElementsByClassName("cursor_item")[0]
+            window.addEventListener('click', mousefunc, false)
+
+            function mousefunc(e) {
+                x = e.clientX
+                y = e.clientY
+                cursor_item.style.transform = "translate(" + x + "px," + y + "px)";
+            }
+
+            // loop()
+        }
+
+        // function loop() {
+        //     console.log(x, y)
+        //     mx += (x - mx) * speed
+        //     my += (y - my) * speed
+        //     h1.innerHTML = "x: " + x + ' mx: ' + mx
+        //     cursor_item.style.transform = "translate(" + mx + "px," + my + "px)";
+        //     window.requestAnimationFrame(loop)
+        // }
+    </script>
+</head>
+<body>
+<!--<h1>test</h1>-->
+<button>START</button>
+<div class="cursor_item"></div>
+</body>
+</html>
